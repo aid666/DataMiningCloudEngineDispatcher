@@ -1,9 +1,11 @@
-# DataMiningCloud Evaluation
+# DataMiningCloud Engine Dispatcher
 
-The repo Service and trainer need to be evaluated for testing.
+Dispatcher is the controller of a running process.
 
-The deployed service and trainer need to be evaluated for using.
+It will response to a running request via a ReST API to create a process instance.
 
-The evaluation service will hold a data store to keep the evaluation data for every repo/deploy svc/trainer, the result will come from engine's process but wrapped by the evalutation service.
+This dispatcher depends on a consul which offer the engine services registry.
 
-Every evaluation method is a deployed DMC Flow, for service, it just process the data and compare with the result attribute. For trainer, it will do a cross-validation to test the trainer.
+This dispatcher will dispatch task to an engine service based on the task's algorithm.
+
+An engine service will dispatch a finished event to this dispatcher when it finished the job.
