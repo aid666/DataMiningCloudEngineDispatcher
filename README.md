@@ -1,4 +1,4 @@
-# DataMiningCloud Engine Dispatcher
+# Task Dispatcher
 
 Dispatcher is the controller of a running process.
 
