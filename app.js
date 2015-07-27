@@ -19,8 +19,8 @@ app.use(express.static(path.join(__dirname, 'swagger-ui')));
 
 setInterval(
   function() {
-    console.log("Check the waiting queue at " + new Date());
-    checker.monitorWaitingQueue();
+    //console.log("Check the waiting queue at " + new Date());
+    //checker.monitorWaitingQueue();
   },
   5*1000);
 
