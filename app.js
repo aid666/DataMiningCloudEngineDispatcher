@@ -5,10 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var dispacther = require('./routes/dispacther');
-
+var slots = require('./routes/slots');
+var checker = require('./queueChecker')
 var app = express();
-
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -18,7 +17,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'swagger-ui')));
 
-app.use('/engine_dispatcher/', dispacther);
+setInterval(
+  function() {
+    console.log("Check the waiting queue at " + new Date());
+    checker.monitorWaitingQueue();
+  },
+  5*1000);
+
+
+app.use('/dispatcher/slots/', slots);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
