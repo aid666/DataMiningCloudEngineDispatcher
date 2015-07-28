@@ -1,4 +1,5 @@
 /node_modules
 mock/node_modules
 *.log
+*.db
 .DS_Store

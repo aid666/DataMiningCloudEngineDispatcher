@@ -1,7 +1,8 @@
 var Client = require('node-rest-client').Client
 var client = new Client();
-
+var shortid = require('shortid');
 var executorFactory = require('./executorFactory');
+var agents = require('./agents');
 
 function locateHub(){
   return "http://localhost:12803/hub/";
@@ -9,10 +10,6 @@ function locateHub(){
 
 function getCheckerKey(){
   return "dispatcher-1"
-}
-
-function checkWaitProc(algs){
-  return null;
 }
 
 function declareFlowToHub(procKey, checkStatus, msg, successCallback, denyCallback){
@@ -49,7 +46,7 @@ function checkingWaitQueue(waitingPros){
   if(item == null) return;
 
   console.log("Checking " + JSON.stringify(item));
-  var err = checkWaitProc(item.flow)
+  var err = agents.checkWaitProc(item.algorithms)
   if(err == null){
     console.log("Flow " + item._id + " is acceptable.")
     declareFlowToHub(
@@ -64,6 +61,7 @@ function checkingWaitQueue(waitingPros){
         checkingWaitQueue(waitingPros);
       });
   }else{
+    console.log("Failed to accept the process for " + err);
     declareFlowToHub(item._id, "DENY", err);
     checkingWaitQueue(waitingPros);
   }
