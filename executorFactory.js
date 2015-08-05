@@ -3,13 +3,20 @@ var client = new Client
 
 var shortid = require('shortid');
 
-
 function locateHub(){
   return "http://localhost:12803/hub/";
 }
 
 function locateProcessURL(){
   return locateHub() + "processes/";
+}
+
+function locateNextNode(slotId, nodeId, callback){
+  return null;
+}
+
+function locateAgent(){
+  return null;
 }
 
 function fetchFlow(procKey, next){
@@ -52,16 +59,42 @@ function createSlot(flow, next){
   next(slotId);
 }
 
+function pushDataToSlots(slotId, workerKey, data, succCallback){
+  var eventData = {
+    "slotId": slotId,
+    "workerKey": workerKey,
+    "data": data
+  }
 
-function assembleExecutor(slotId){
-  console.log("Locate the slot" + slotId);
+  slotData.insert(eventData, function(err, doc){
+    if(succCallback != null){
+      succCallback();
+    }
+  });
+}
+
+function assembleExecutor(slotId, nodeId){
   return {
     run: function(){
       console.log("Run the slot:" + slotId);
 
-      console.log("Fetch the data of the slot:" + slotId);
+      locateNextNode(slotId, nodeId, function(nextNode){
+        console.log("Get next node " + nextNode);
 
-      console.log("Locate the agent and send the input data");
+        locateAgent(nextNode.alg, function(agentKey){
+          console.log("Fetch the data of the slot:" + slotId);
+          slotData.find(
+            {
+              "slotId": slotId,
+              "nodeId": workerKey
+            },
+            function(err, docs){
+              console.log(docs);
+              console.log("Locate the agent and send the input data");
+
+          })
+        })
+      })
     }
   }
 }
@@ -80,13 +113,14 @@ module.exports = {
         createSlot(
           flow,
           function(slotId){
-            console.log("Fetch the input data");
-
+            console.log("Start to fetch the input data");
             fetchInputData(
               procKey,
               function(data){
                 console.log("Put the init data");
-                assembleExecutor(slotId).run();
+                pushDataToSlots(slotId, data, function(){
+                  assembleExecutor(slotId).run();
+                })
               });
 
           });

@@ -2,11 +2,13 @@ var Client = require('node-rest-client').Client
 var client = new Client();
 var shortid = require('shortid');
 
-agents = {},
-
 module.exports = {
 
-  syncAgents: function(){
+  /*
+    The sync function will fetch the agents list from a DataCenter.
+    And for each agents, the dispatcher will query its status, capicity.
+  */
+  syncAgents: function(callback){
     agentsDB.find({}, function(err, docs){
       if(docs.length == 0){
         agentsDB.insert({
@@ -17,15 +19,28 @@ module.exports = {
           console.log(JSON.stringify(newDoc));
         });
       } else {
-        agents = {};
+        agentsArray = {};
         for (item of docs) {
           var algKey = item.alg;
-          if(agents[algKey] == null){
-            agents[algKey] = [];
+          if(agentsArray[algKey] == null){
+            agentsArray[algKey] = [];
           }
-          agents[algKey].push(item.url);
+          agentsArray[algKey].push(item.url);
         }
-        console.log(agents);
+        console.log(agentsArray);
+        if(callback != null){
+          callback(agentsArray);
+        }
+      }
+    })
+  },
+
+  pickAgent: function(alg, successCallback, errorCallback){
+    agentsDB.find({algorithm: alg}, function(err, docs){
+      if(dcos.count > 0 && successCallback != null){
+        successCallback(docs[0]);
+      }else {
+        errorCallback(null);
       }
     })
   },
@@ -35,7 +50,7 @@ module.exports = {
       return "Empty algs array";
     }else{
       for (alg of algs) {
-        if(agents[alg] == null){
+        if(agentsArray[alg] == null){
           return "Can't support alg: " + alg;
         }
       }

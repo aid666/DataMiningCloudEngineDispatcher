@@ -6,13 +6,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var slots = require('./routes/slots');
-var checker = require('./queueChecker')
-var agents = require('./agents');
+var agents = require('./routes/agentsEndPoint');
+var checker = require('./queueChecker');
 
 var app = express();
 
 var Datastore = require('nedb');
-agentsDB = new Datastore({filename: './agents.db', autoload:true});
+agentsDB = new Datastore();
+slotData = new Datastore();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -29,16 +30,10 @@ setInterval(
   },
   2*1000);
 
-
-setInterval(
-  function() {
-    console.log("Check the agents " + new Date());
-    agents.syncAgents();
-  },
-  10*1000);
-
+agentsArray = {};
 
 app.use('/dispatcher/slots/', slots);
+app.use('/agents/', agents);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
