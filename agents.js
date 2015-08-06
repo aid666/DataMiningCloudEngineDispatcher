@@ -16,7 +16,7 @@ module.exports = {
           url: "http://localhost:12805/"
         },
         function(err, newDoc){
-          console.log(JSON.stringify(newDoc));
+          //console.log(JSON.stringify(newDoc));
         });
       } else {
         agentsArray = {};
@@ -27,7 +27,6 @@ module.exports = {
           }
           agentsArray[algKey].push(item.url);
         }
-        console.log(agentsArray);
         if(callback != null){
           callback(agentsArray);
         }

@@ -12,11 +12,10 @@ function locateProcessURL(){
 }
 
 function locateNextNode(slotId, nodeId, callback){
-  return null;
-}
-
-function locateAgent(){
-  return null;
+  //Look through the flow by slotId and nodeId
+  callback({
+    alg: "NativeBayesClassifier"
+  });
 }
 
 function fetchFlow(procKey, next){
@@ -73,6 +72,12 @@ function pushDataToSlots(slotId, workerKey, data, succCallback){
   });
 }
 
+function dispatchTask(agent, node, data){
+  console.log("Send data: "  + data);
+  console.log("To " + agent);
+  console.log("For " + node);
+}
+
 function assembleExecutor(slotId, nodeId){
   return {
     run: function(){
@@ -81,8 +86,8 @@ function assembleExecutor(slotId, nodeId){
       locateNextNode(slotId, nodeId, function(nextNode){
         console.log("Get next node " + nextNode);
 
-        locateAgent(nextNode.alg, function(agentKey){
-          console.log("Fetch the data of the slot:" + slotId);
+        agents.pickAgent(nextNode.alg, function(agent){
+          console.log("Get agent " + agent);
           slotData.find(
             {
               "slotId": slotId,
@@ -90,8 +95,17 @@ function assembleExecutor(slotId, nodeId){
             },
             function(err, docs){
               console.log(docs);
+              var nextData;
               console.log("Locate the agent and send the input data");
+              if(docs.length > 1){
+                nextData = docs[0];
+              }
 
+              if(nextData != null){
+                dispatchTask(agent, nextNode, nextData);
+              }else {
+                console.log("Can NOT find the data");
+              }
           })
         })
       })
