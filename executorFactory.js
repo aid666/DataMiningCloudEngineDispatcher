@@ -12,9 +12,9 @@ function locateProcessURL(){
 }
 
 function locateNextNode(slotId, nodeId, callback){
-  //Look through the flow by slotId and nodeId
+  //TODO: Look through the flow by slotId and nodeId
   callback({
-    alg: "NativeBayesClassifier"
+    alg: "NaiveBayesClassifier"
   });
 }
 
@@ -35,7 +35,6 @@ function fetchFlow(procKey, next){
 }
 
 function fetchInputData(procKey, next){
-
   var url = locateProcessURL() + procKey + "/data";
   client.get(
     url,
@@ -55,7 +54,13 @@ function createSlot(flow, next){
   var slotId = shortid.generate();
 
   console.log("create slot as " + slotId);
-  next(slotId);
+  var slot = {
+    _id: slotId,
+    "flow": flow,
+  }
+  slotDB.insert(slot, function(err, newdoc){
+    next(slotId);
+  })
 }
 
 function pushDataToSlots(slotId, workerKey, data, succCallback){
@@ -72,10 +77,34 @@ function pushDataToSlots(slotId, workerKey, data, succCallback){
   });
 }
 
-function dispatchTask(agent, node, data){
+function dispatchTask(slot, agent, node, data){
   console.log("Send data: "  + data);
   console.log("To " + agent);
   console.log("For " + node);
+
+  var task = {
+    datetime: new Date(),
+    "node": node,
+    "data": data
+  }
+
+  var url = agent.taskEndPoint;
+  var args = {
+    data: task,
+    headers:{
+      "Content-Type": "application/json"
+    }
+  }
+  client.post(
+    url,
+    args,
+    function(data, response){
+        if( response.statusCode == 204 ){
+          //success callback
+        }else {
+          //error callback
+        }
+    });
 }
 
 function assembleExecutor(slotId, nodeId){
@@ -102,7 +131,7 @@ function assembleExecutor(slotId, nodeId){
               }
 
               if(nextData != null){
-                dispatchTask(agent, nextNode, nextData);
+                dispatchTask(slotId, agent, nextNode, nextData);
               }else {
                 console.log("Can NOT find the data");
               }

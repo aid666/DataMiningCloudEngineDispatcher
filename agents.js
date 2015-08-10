@@ -2,6 +2,23 @@ var Client = require('node-rest-client').Client
 var client = new Client();
 var shortid = require('shortid');
 
+function checkAgentStatus(item){
+  console.log("Check status for " + JSON.stringify(item));
+  /*
+  var url = item.url + "/status";
+  client.get(
+    url,
+    function(data, response){
+      var stringData = data.toString('utf-8');
+      if(response.statusCode == 200){
+        checkingWaitQueue(JSON.parse(stringData));
+      }else{
+        console.log("Failed to fetch the waiting queue");
+      }
+    });
+    */
+}
+
 module.exports = {
 
   /*
@@ -10,26 +27,18 @@ module.exports = {
   */
   syncAgents: function(callback){
     agentsDB.find({}, function(err, docs){
-      if(docs.length == 0){
-        agentsDB.insert({
-          alg: "NaiveBayesClassifier",
-          url: "http://localhost:12805/"
-        },
-        function(err, newDoc){
-          //console.log(JSON.stringify(newDoc));
-        });
-      } else {
-        agentsArray = {};
-        for (item of docs) {
-          var algKey = item.alg;
+      agentsArray = {};
+      for (item of docs) {
+        for(algKey of item.algs){
           if(agentsArray[algKey] == null){
             agentsArray[algKey] = [];
           }
           agentsArray[algKey].push(item.url);
         }
-        if(callback != null){
-          callback(agentsArray);
-        }
+        checkAgentStatus(item);
+      }
+      if(callback != null){
+        callback(agentsArray);
       }
     })
   },

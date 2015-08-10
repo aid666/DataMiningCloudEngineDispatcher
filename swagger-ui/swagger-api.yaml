@@ -9,7 +9,7 @@ info:
   license:
     name: MIT
     url: 'http://opensource.org/licenses/MIT'
-basePath: /engine_dispatcher/
+basePath: /dispatcher
 schemes:
   - http
 consumes:
@@ -20,15 +20,43 @@ produces:
   - application/xml
 paths:
 
+  /slots:
+    get:
+      tags:
+      - slots
+      summary: Check the status of slots
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Slot'
+
   /slots/{key}:
     get:
       tags:
       - slots
+      summary: Check the status of slot
       parameters:
       - name: key
         in: path
         type: string
-      sumary: Check the status of slots
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Slot'
+
+  /slots/{key}/event:
+    get:
+      tags:
+      - events
+      summary: Check the events of slot
+      parameters:
+      - name: key
+        in: path
+        type: string
       responses:
         200:
           description: OK
@@ -36,9 +64,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/TaskEvent'
-
-
-  /slots/{key}:
     post:
       tags:
       - slots
@@ -101,6 +126,12 @@ definitions:
         type: string
       dataInfor:
         $ref: '#/definitions/DataInfor'
+
+  Slot:
+    properties:
+      _id:
+        type: string
+
 
   TaskEvent:
     properties:

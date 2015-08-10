@@ -13,7 +13,9 @@ var checker = require('./queueChecker');
 var app = express();
 
 var Datastore = require('nedb');
-agentsDB = new Datastore();
+agentsDB = new Datastore({filename: 'agents.db', autoload: true});
+slotDB = new Datastore();
+slotEvent = new Datastore();
 slotData = new Datastore();
 
 // uncomment after placing your favicon in /public
