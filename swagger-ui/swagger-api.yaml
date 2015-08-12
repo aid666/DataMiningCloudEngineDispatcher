@@ -14,10 +14,8 @@ schemes:
   - http
 consumes:
   - application/json
-  - application/xml
 produces:
   - application/json
-  - application/xml
 paths:
 
   /slots:

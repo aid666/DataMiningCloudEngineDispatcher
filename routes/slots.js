@@ -36,12 +36,15 @@ router.get('/:slotId/events', function(req, res, next) {
 });
 
 router.post('/:slotId/events', function(req, res, next) {
+  var evt = req.body;
+  var taskEvent = {
+    "slotId": slotId,
+    "nextNodeKey": evt.nextNodeKey,
+    "data": evt.data,
+    "log": evt.log
+  }
   slotDB.find({"_id": slotId}, function(err, docs){
     if(err == null && docs.length == 1){
-      var taskEvent = {
-        "slotId": slotId,
-      }
-
       slotEvents.insert(taskEvent, function(err, newDoc){
         if(err == null){
           res.json(newDoc);
